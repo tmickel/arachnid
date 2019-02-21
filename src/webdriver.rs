@@ -24,6 +24,29 @@ pub struct WebDriverContext {
 }
 
 /**
+ * Helpers: create URLs based on configs.
+ */
+fn make_webdriver_url(context: &WebDriverContext, path: &str) -> String {
+    format!(
+        "http://{}:{}{}",
+        context.config.gecko_driver_host,
+        context.config.gecko_driver_port,
+        path
+    )
+}
+
+fn make_webdriver_session_url(context: &WebDriverContext, session_id: &str, path: &str)
+    -> String {
+    format!(
+        "http://{}:{}/session/{}{}",
+        context.config.gecko_driver_host,
+        context.config.gecko_driver_port,
+        session_id,
+        path
+    )
+}
+
+/**
  * Create a new WebDriver session, and attach it to the provided context.
  * https://www.w3.org/TR/webdriver1/#new-session
  */
@@ -34,11 +57,12 @@ pub fn create_session(context: &mut WebDriverContext) {
     });
 
     let mut response = context.client
-        .post("http://localhost:4444/session")
+        .post(&make_webdriver_url(context, "/session"))
         .json(&session_request)
         .send()
         .expect("Couldn't create WebDriver session.");
     assert!(response.status().is_success(), "Couldn't create WebDriver session");
+    
     let inner_response : CreateSessionResponse = response.json()
         .expect("Received invalid response from WebDriver");
     context.session_id = Some(inner_response.value.sessionId);
@@ -64,7 +88,7 @@ pub fn delete_session(context: &WebDriverContext) {
     let session_id = context.session_id.clone()
         .expect("Cannot run without an established session.");
     context.client
-        .delete(&format!("http://localhost:4444/session/{}", session_id))
+        .delete(&make_webdriver_session_url(context, &session_id, ""))
         .send()
         .expect("Couldn't destroy WebDriver session.");
 }
@@ -81,7 +105,7 @@ pub fn navigate(context: &WebDriverContext, url: url::Url) {
     let session_id = context.session_id.clone()
         .expect("Cannot run without an established session.");
     context.client
-        .post(&format!("http://localhost:4444/session/{}/url", session_id))
+        .post(&make_webdriver_session_url(context, &session_id, "/url"))
         .json(&navigate_request)
         .send()
         .expect("Couldn't navigate WebDriver -- is geckodriver still running?");
@@ -129,10 +153,7 @@ pub fn get_element(context: &WebDriverContext, using: WebDriverLocatorStrategy, 
         "value": value
     });
     let mut element_response = context.client
-        .post(&format!(
-            "http://localhost:4444/session/{}/element",
-            session_id
-        ))
+        .post(&make_webdriver_session_url(context, &session_id, "/element"))
         .json(&element_request)
         .send()
         .expect("Couldn't select top-level element.");
@@ -161,11 +182,10 @@ pub fn get_text(context: &WebDriverContext, element: WebDriverElement) -> String
     let session_id = context.session_id.clone()
         .expect("Cannot run without an established session.");
 
-    let mut text_response = context.client.get(&format!(
-            "http://localhost:4444/session/{}/element/{}/text",
-            session_id,
-            element
-        )).send()
+    let mut text_response = context.client.get(
+        &make_webdriver_session_url(
+            context, &session_id, &format!("/element/{}/text", element))
+        ).send()
         .expect("Couldn't get element text from WebDriver");
     let text_response_json: TextResponse = text_response.json()
         .expect("Couldn't parse element text from WebDriver");
