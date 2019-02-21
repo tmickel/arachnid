@@ -1,0 +1,18 @@
+{
+    "gecko_driver_host": "127.0.0.1",
+    "gecko_driver_port": "4444",
+    "gecko_driver_capabilities": {
+        "alwaysMatch": {
+            "moz:firefoxOptions": {
+                "args": [
+                    "-headless"
+                ],
+                "prefs": {
+                    "network.http.sendRefererHeader": 0,
+                    "permissions.default.image": 2,
+                    "dom.storage.enabled": false
+                }
+            }
+        }
+    }
+}

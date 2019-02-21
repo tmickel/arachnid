@@ -7,3 +7,4 @@ authors = ["Tim Mickel <tim@tmickel.com>"]
 reqwest = "0.9.10"
 serde_json = "1.0"
 serde = { version = "1.0.88", features = ["derive"] }
+url = "1.7.2"
