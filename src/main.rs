@@ -21,8 +21,8 @@ fn main() -> Result<(), Box<std::error::Error>> {
     let html_element =
         webdriver::get_element(
             &context,
-            webdriver::WebDriverLocatorStrategy::TagName,
-            "html"
+            webdriver::WebDriverLocatorStrategy::XPath,
+            "/*"
         );
     println!("{}", webdriver::get_text(&context, html_element));
     webdriver::delete_session(&context);
