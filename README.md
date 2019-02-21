@@ -7,7 +7,7 @@ Welcome to Arachnid, an experimental general-purpose web crawler,
 written in Rust.
 
 Arachnid functions by driving a real web browser (Firefox). It then uses
-the standard WebDriver protocol to gather information from pages.
+the standard WebDriver protocol to gather information from pages. Not much is done yet (e.g., it doesn't follow links, have a queue for pages, or store the data anywhere...)
 
 To run, first install Rust, Firefox, and [geckodriver](https://github.com/mozilla/geckodriver). Then:
 
